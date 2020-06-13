@@ -31,11 +31,13 @@ void main(){
     vec4 color = vec4(0.0,0.7,1.0,0.5);
 
     vec2 pos = vUV * 2.0;
-    pos.y -= uTime * 0.002;
-    vec4 WaterLines = texture2D(uSurfaceTexture,pos);
-    color.rgba += WaterLines.r * 0.1;
+    pos.y -= uTime * 0.005;
+    // 表面
+    vec4 WaterLines = texture2D(uSurfaceTexture, pos);
+    // 水下投影
+    vec4 WaterLinesDeep = texture2D(uSurfaceTexture, pos + vec2(-0.1, -0.1));
+    color.rgba += WaterLines.r * 0.8 + WaterLinesDeep.r * vec4(0.0, 0.0, 0.9, 0.1);
 
-    //float worldDepth = getLinearDepth(WorldPosition);
     float worldDepth = getLinearScreenDepth(uDepthMap2);
     float screenDepth = getLinearScreenDepth(uDepthMap);
     float foamLine = clamp((screenDepth - worldDepth),0.0,1.0) ;
