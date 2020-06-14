@@ -1,4 +1,4 @@
-import * as THREE from "three/build/three.module";
+import * as THREE from "three";
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import {MTLLoader} from "three/examples/jsm/loaders/MTLLoader";
 import {OBJLoader} from "three/examples/jsm/loaders/OBJLoader";
@@ -17,10 +17,10 @@ class MainScene {
     private cameraNear: THREE.IUniform = {value: 0}
     private cameraFar: THREE.IUniform = {value: 0}
 
-    public complete = false;
     public uDepthMap: THREE.IUniform = {value: null}
     public uDepthMap2: THREE.IUniform = {value: null}
     public isMask: THREE.IUniform = {value: false}
+    public isDepth: THREE.IUniform = {value: false}
     public waterMat: THREE.ShaderMaterial
 
     uScreenSize: THREE.IUniform = {value: new THREE.Vector4(window.innerWidth, window.innerHeight, 1 / window.innerWidth, 1 / window.innerHeight)}
@@ -78,7 +78,6 @@ class MainScene {
         const mtLoader = new MTLLoader()
         mtLoader.setPath('assets/materials/');
         mtLoader.setResourcePath('assets/textures/');
-        let complete = 0;
         for (let option of this.models) {
             //@ts-ignore
             const {name, pos, scale = 1} = option
@@ -101,11 +100,6 @@ class MainScene {
                     // objects[model.name] = object;
                     object.position.set(pos.x, pos.y, pos.z);
                     object.scale.set(scale, scale, scale);
-                    complete++;
-                    if(complete>=this.models.length){
-                        this.complete = true;
-                        console.log("resource loaded")
-                    }
                 })
             })
         }
@@ -120,11 +114,12 @@ class MainScene {
             uniforms: {
                 uTime: this.uTime,
                 uSurfaceTexture: {value: waterLinesTexture},
-                // cameraNear: this.cameraNear,
-                // cameraFar: this.cameraFar,
+                cameraNear: this.cameraNear,
+                cameraFar: this.cameraFar,
                 uDepthMap: this.uDepthMap,
                 uDepthMap2: this.uDepthMap2,
                 isMask: this.isMask,
+                isDepth: this.isDepth,
                 uScreenSize: this.uScreenSize
             },
             vertexShader: waterVertShader,

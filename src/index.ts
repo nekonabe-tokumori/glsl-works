@@ -37,7 +37,7 @@ function main(){
     });
 
     const depthTarget = new THREE.WebGLRenderTarget(width, height,{
-        format: THREE.RGBFormat,
+        // format: THREE.RGBFormat,
         minFilter: THREE.NearestFilter,
         magFilter: THREE.NearestFilter,
         generateMipmaps:false,
@@ -45,14 +45,18 @@ function main(){
         depthBuffer:true
     });
 
+    depthTarget.depthTexture = new THREE.DepthTexture(width, height)
+
     const depthTarget2 = new THREE.WebGLRenderTarget(width, height,{
-        format: THREE.RGBFormat,
+        // format: THREE.RGBFormat,
         minFilter: THREE.NearestFilter,
         magFilter: THREE.NearestFilter,
         generateMipmaps:false,
         stencilBuffer:false,
         depthBuffer:true
     });
+
+    depthTarget2.depthTexture = new THREE.DepthTexture(width, height)
 
     const AATarget = new THREE.WebGLRenderTarget(width, height, {
         format: THREE.RGBFormat,
@@ -62,8 +66,6 @@ function main(){
         stencilBuffer:false
     });
 
-    scene.uDepthMap.value = depthTarget.depthTexture;
-    scene.uDepthMap2.value = depthTarget2.depthTexture;
     postScene.uColorBuffer.value = mainTarget.texture;
     postScene.uMaskBuffer.value = maskTarget.texture;
     aaScene.dataTexture.value = AATarget.texture;
@@ -78,14 +80,10 @@ function main(){
     const clamped = new Uint8ClampedArray(buffer.buffer);
     function update(){
         requestAnimationFrame(update)
-        if(!scene.complete) return;
-
         scene.update()
         scene.render(renderer, mainTarget)
         // 调试输出纹理
-        // renderer.readRenderTargetPixels(mainTarget, 0, 0, width, height, buffer);
-        // const imageData = new ImageData(clamped, width, height);
-        // ctx.putImageData(imageData, 0, 0);
+
         postScene.update();
         // Render the water mask
         scene.isMask.value = true;
@@ -93,10 +91,25 @@ function main(){
         scene.isMask.value = false;
 
         // Render onto depth buffer
+        scene.uDepthMap.value = null
+        scene.uDepthMap2.value = null
+
+        scene.isDepth.value = true;
         scene.waterMat.depthWrite = false;
         scene.render(renderer, depthTarget)
-        scene.waterMat.depthWrite = true;
+        scene.waterMat.depthWrite = true
         scene.render(renderer, depthTarget2)
+        scene.isDepth.value = false;
+
+        scene.uDepthMap2.value = depthTarget2.depthTexture
+        scene.uDepthMap.value = depthTarget.depthTexture
+
+        // renderer.readRenderTargetPixels(depthTarget, 0, 0, width, height, buffer);
+        // const imageData = new ImageData(clamped, width, height);
+        // ctx.putImageData(imageData, 0, 0);
+
+        // postScene.uColorBuffer.value = depthTarget.texture
+        // return postScene.render(renderer)
 
         postScene.render(renderer, AATarget)
         aaScene.render(renderer)

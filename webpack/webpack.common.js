@@ -33,9 +33,9 @@ module.exports = {
 		]
 	},
 
-	// externals: {
-	// 	three: "THREE"
-	// },
+	externals: {
+		three: "THREE"
+	},
 
 	plugins: [
 		// new CleanWebpackPlugin(['dist/*']) for < v2 versions of CleanWebpackPlugin

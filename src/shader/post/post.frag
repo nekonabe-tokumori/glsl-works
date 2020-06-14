@@ -19,6 +19,7 @@ void main() {
         pos = vUv;
     }
 
-    vec4 color = texture2D(uColorBuffer, pos);
+    vec4 color = texture2D(uColorBuffer, vUv);
     gl_FragColor = color;
+//    gl_FragColor = vec4(vec3(pow(gl_FragColor.z, 2.0)), 1.0);
 }
