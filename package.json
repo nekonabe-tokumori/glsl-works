@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "three": "^0.117.1"
+    "three": "^0.125.0"
   },
   "scripts": {
     "serve": "webpack-dev-server --config webpack/webpack.dev.js",
